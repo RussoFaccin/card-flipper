@@ -49,6 +49,7 @@ function add_meta_boxes() {
     'cardflipper_frente_cb',
     'card_flipper'
   );
+
   // Card Verso
   add_meta_box(
     'cardflipper_verso',
@@ -60,15 +61,15 @@ function add_meta_boxes() {
 
 function cardflipper_frente_cb($post) {
   $value = get_post_custom_values('cardflipper_frente', $post->ID);
-  $thumb = '<img src="'.$value[0].'"/>';
-  $field = '<input type="text" name="cardflipper_frente" value="'.$value[0].'">';
+  $thumb = '<img class="card-thumb" src="'.$value[0].'"/>';
+  $field = '<input type="hidden" name="cardflipper_frente" value="'.$value[0].'">';
   $button = '<button class="cardflipper-upload">UPLOAD</button>';
   echo '<div class="option-item">'.$thumb.$field.$button.'</div>';
 }
 function cardflipper_verso_cb($post) {
   $value = get_post_custom_values('cardflipper_verso', $post->ID);
-  $thumb = '<img src="'.$value[0].'"/>';
-  $field = '<input type="text" name="cardflipper_verso" value="'.$value[0].'">';
+  $thumb = '<img class="card-thumb" src="'.$value[0].'"/>';
+  $field = '<input type="hidden" name="cardflipper_verso" value="'.$value[0].'">';
   $button = '<button class="cardflipper-upload">UPLOAD</button>';
   echo '<div class="option-item">'.$thumb.$field.$button.'</div>';
 }
@@ -78,6 +79,7 @@ function cardflipper_verso_cb($post) {
 ################################################## */
 
 add_action( 'save_post', 'on_save_post');
+
 function on_save_post($postid) {
   $fld_cardflipper_frente = $_POST['cardflipper_frente'];
   $fld_cardflipper_verso = $_POST['cardflipper_verso'];
@@ -86,44 +88,16 @@ function on_save_post($postid) {
 }
 
 /* ##################################################
-  ADMIN SCRIPTS
+  ADMIN SCRIPTS && STYLES
 ################################################## */
 
-// Enqueue Media
 add_action('admin_enqueue_scripts', 'enqueue_media', 0 );
+
 function enqueue_media() {
-	wp_enqueue_media();
-}
-
-// Admin Footer
-add_action( 'admin_footer', 'admin_footer');
-function admin_footer() {
-  ?><script>
-    jQuery(document).ready(function($){
-      var frame = wp.media({
-        title: 'Select or Upload Media Of Your Chosen Persuasion',
-        button: {
-          text: 'Use this media'
-        },
-        multiple: false  // Set to true to allow multiple files to be selected
-      });
-
-      var fldUrl = null;
-
-      frame.on('select', function(evt) {
-        var attachment = frame.state().get('selection').first().toJSON().url;
-        fldUrl.value = attachment;
-      })
-
-      var btnsUpload = document.querySelectorAll('.cardflipper-upload');
-      btnsUpload.forEach(function(item, index) {
-        item.addEventListener('click', function(evt) {
-          evt.preventDefault();
-          fldUrl = evt.target.previousElementSibling;
-          frame.open();
-        });
-      });
-    });
-  </script><?php
+  wp_enqueue_media();
+  // CSS
+  wp_enqueue_style( 'cardflipper_admin_css', plugins_url('css/cardflipper.css', __FILE__) );
+  // JS
+  wp_enqueue_script( 'cardflipper_admin_js', plugins_url('js/card-flipper.js', __FILE__) );
 }
 ?>
