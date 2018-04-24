@@ -100,4 +100,23 @@ function enqueue_media() {
   // JS
   wp_enqueue_script( 'cardflipper_admin_js', plugins_url('js/card-flipper.js', __FILE__) );
 }
+
+/* ##################################################
+  SHRTCODE
+################################################## */
+
+add_shortcode( 'CardFlipper', 'cardflipper_code' );
+
+function cardflipper_code( $atts ){
+  $args = array('post_type' => 'card_flipper', 'posts_per_page' => -1);
+	$loop = new WP_Query( $args );
+	$html = null;
+	while ( $loop->have_posts() ) : $loop->the_post();
+		$post_id = get_the_ID();
+    $imgfrente = get_post_meta($post_id, 'cardflipper_frente', true);
+    $imgverso = get_post_meta($post_id, 'cardflipper_verso', true);
+    $html .= '<div class="card-item"><div class="card-wraper"><div class="card-face"><img class="verso" src="'.$imgverso.'"></div><div class="card-face"><img class="frente" src="'.$imgfrente.'"></div></div></div>';
+	endwhile;
+	return '<div id="cardflipper-container">'.$html.'</div>';
+}
 ?>
